@@ -1,0 +1,42 @@
+store()
+
+if (!$this->validate($rules)) {
+
+    return $this->response
+        ->setStatusCode(422)
+        ->setJSON([
+            'status' => false,
+            'errors' => $this->validator->getErrors()
+        ]);
+}
+
+-----------------------------
+
+handle
+
+error: function (xhr) {
+
+    if (xhr.status === 422) {
+
+        let response = xhr.responseJSON;
+
+        let errors = response.errors;
+
+        let messages = '';
+
+        $.each(errors, function (field, message) {
+
+            messages += message + "\n";
+
+        });
+
+        alert(messages);
+
+    } else {
+
+        alert('Something went wrong.');
+
+    }
+
+}
+

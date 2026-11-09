@@ -1,0 +1,3 @@
+AJAX employee search without reloading the page.
+
+AJAX allows the browser to communicate with the server asynchronously without reloading the entire page. The server can return data such as JSON, and JavaScript can update only the required part of the page.
