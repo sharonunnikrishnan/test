@@ -1,0 +1,245 @@
+1. Change the Add Employee form
+
+app/Views/employees/create.php
+
+<form action="<?= site_url('employees') ?>" method="post" enctype="multipart/form-data">
+
+------------------------------------
+
+2. Add the file input
+
+<div>
+    <label>Profile Image</label>
+    <input type="file" name="profile_image" accept="image/*">
+</div>
+
+<br>
+
+---------------------------------------
+
+3. Get the uploaded file
+
+$file = $this->request->getFile('profile_image');
+
+-----------------------------------------
+
+4. Validate the image
+
+if ($file && $file->isValid() && !$file->hasMoved()) {
+
+    $newName = $file->getRandomName();
+
+    $file->move(
+        FCPATH . 'uploads/employees',
+        $newName
+    );
+}
+
+-------------------------------------------------------
+
+5. Save the filename in the database
+
+
+public function store()
+{
+    $rules = [
+        'name'       => 'required|min_length[3]|max_length[100]',
+        'email'      => 'required|valid_email',
+        'phone'      => 'required|min_length[10]|max_length[15]',
+        'department' => 'required',
+        'status'     => 'required|in_list[active,inactive]',
+    ];
+
+    if (!$this->validate($rules)) {
+        return redirect()->back()
+            ->withInput()
+            ->with('errors', $this->validator->getErrors());
+    }
+
+    $file = $this->request->getFile('profile_image');
+
+    $profileImage = null;
+
+    if ($file && $file->isValid() && !$file->hasMoved()) {
+
+        $profileImage = $file->getRandomName();
+
+        $file->move(
+            FCPATH . 'uploads/employees',
+            $profileImage
+        );
+    }
+
+    $model = new EmployeeModel();
+
+    $data = [
+        'name'          => $this->request->getPost('name'),
+        'email'         => $this->request->getPost('email'),
+        'phone'         => $this->request->getPost('phone'),
+        'department'    => $this->request->getPost('department'),
+        'profile_image' => $profileImage,
+        'status'        => $this->request->getPost('status'),
+    ];
+
+    $model->insert($data);
+
+    return redirect()->to('/employees');
+}
+
+-------------------------------------------------------
+
+1. Add image validation
+
+$rules = [
+    'name'          => 'required|min_length[3]|max_length[100]',
+    'email'         => 'required|valid_email',
+    'phone'         => 'required|min_length[10]|max_length[15]',
+    'department'    => 'required',
+    'profile_image' => 'permit_empty|is_image[profile_image]|mime_in[profile_image,image/jpg,image/jpeg,image/png,image/webp]|max_size[profile_image,2048]',
+    'status'        => 'required|in_list[active,inactive]',
+];
+
+-----------------------------------------------------------------
+3. Display the profile image
+
+<?php foreach ($employees as $employee): ?>
+
+<tr>
+
+    <td><?= esc($employee['id']) ?></td>
+
+    <td>
+        <?php if (!empty($employee['profile_image'])): ?>
+
+            <img
+                src="<?= base_url('uploads/employees/' . $employee['profile_image']) ?>"
+                width="80"
+                height="80"
+                alt="<?= esc($employee['name']) ?>"
+            >
+
+        <?php else: ?>
+
+            No Image
+
+        <?php endif; ?>
+    </td>
+
+    <td><?= esc($employee['name']) ?></td>
+
+    <td><?= esc($employee['email']) ?></td>
+
+    <td><?= esc($employee['phone']) ?></td>
+
+    <td><?= esc($employee['department']) ?></td>
+
+    <td><?= esc($employee['status']) ?></td>
+
+    <!-- Actions -->
+    
+</tr>
+
+<?php endforeach; ?>
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+For edit image
+
+1. Add image upload to the Edit form
+
+app/Views/employees/edit.php
+<div>
+    <label>Profile Image</label>
+
+    <?php if (!empty($employee['profile_image'])): ?>
+
+        <div>
+            <img
+                src="<?= base_url('uploads/employees/' . $employee['profile_image']) ?>"
+                width="100"
+                height="100"
+                alt="<?= esc($employee['name']) ?>"
+            >
+        </div>
+
+    <?php endif; ?>
+
+    <br>
+
+    <input
+        type="file"
+        name="profile_image"
+        accept="image/*"
+    >
+</div>
+
+<br>
+
+2. Add image validation to update()
+
+public function update($id)
+{
+    $rules = [
+        'name'          => 'required|min_length[3]|max_length[100]',
+        'email'         => 'required|valid_email',
+        'phone'         => 'required|min_length[10]|max_length[15]',
+        'department'    => 'required',
+        'profile_image' => 'permit_empty|is_image[profile_image]|mime_in[profile_image,image/jpg,image/jpeg,image/png,image/webp]|max_size[profile_image,2048]',
+        'status'        => 'required|in_list[active,inactive]',
+    ];
+
+    if (!$this->validate($rules)) {
+        return redirect()->back()
+            ->withInput()
+            ->with('errors', $this->validator->getErrors());
+    }
+
+    $model = new EmployeeModel();
+
+    $employee = $model->find($id);
+
+    if (!$employee) {
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+    }
+
+    $oldImage = $employee['profile_image'];
+
+    $file = $this->request->getFile('profile_image');
+
+    $profileImage = $oldImage;
+
+    if ($file && $file->isValid() && !$file->hasMoved()) {
+
+        $profileImage = $file->getRandomName();
+
+        $file->move(
+            FCPATH . 'uploads/employees',
+            $profileImage
+        );
+
+        if (!empty($oldImage)) {
+
+            $oldImagePath = FCPATH . 'uploads/employees/' . $oldImage;
+
+            if (is_file($oldImagePath)) {
+                unlink($oldImagePath);
+            }
+        }
+    }
+
+    $data = [
+        'name'          => $this->request->getPost('name'),
+        'email'         => $this->request->getPost('email'),
+        'phone'         => $this->request->getPost('phone'),
+        'department'    => $this->request->getPost('department'),
+        'profile_image' => $profileImage,
+        'status'        => $this->request->getPost('status'),
+    ];
+
+    $model->update($id, $data);
+
+    return redirect()->to('/employees');
+}
+
+

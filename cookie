@@ -1,0 +1,26 @@
+$response = service('response');
+
+$response->setCookie('username', 'Sharon', 3600);
+
+return $response;
+
+---------------------------
+
+setCookie(
+    'username',
+    'Sharon',
+    3600
+);
+
+---------------------------
+
+$username = $this->request->getCookie('username');
+
+echo $username;
+
+--------------------------------------
+
+return $this->response->deleteCookie('username');
+
+----------------------------------------
+

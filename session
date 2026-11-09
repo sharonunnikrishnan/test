@@ -1,0 +1,72 @@
+session()->set('user_id', 25);
+session()->set('name', 'Sharon');
+
+--------------------------------------
+session()->set([
+    'user_id' => 25,
+    'name'    => 'Sharon',
+    'role'    => 'admin'
+]);
+
+-----------------------------------
+
+$userId = session()->get('user_id');
+
+echo $userId;
+
+--------------------------------------
+
+or
+
+$name = session('name');
+
+echo $name;
+-------------------------------------
+
+Check session value exist
+
+if (session()->has('user_id')) {
+    echo "User is logged in";
+}
+
+-----------------------------------------
+
+session()->remove('user_id');
+
+----------------------------------------
+
+session()->destroy();
+
+-----------------------------------------
+
+public function login()
+{
+    $username = $this->request->getPost('username');
+    $password = $this->request->getPost('password');
+
+    // Normally you would verify the user from database
+
+    if ($username === 'admin' && $password === '123456') {
+
+        session()->set([
+            'user_id' => 1,
+            'username' => 'admin',
+            'logged_in' => true
+        ]);
+
+        return redirect()->to('/dashboard');
+    }
+
+    return redirect()->back()->with('error', 'Invalid username or password');
+}
+
+---------------------------------
+
+public function dashboard()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to('/login');
+    }
+
+    return view('dashboard');
+}
