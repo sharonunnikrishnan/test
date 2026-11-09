@@ -1,0 +1,54 @@
+1. Create an API controller
+
+app/Controllers/Api/EmployeeApiController.php
+
+----------------------------------------------------
+
+<?php
+
+namespace App\Controllers\Api;
+
+use App\Controllers\BaseController;
+use App\Models\EmployeeModel;
+
+class EmployeeApiController extends BaseController
+{
+    public function index()
+    {
+        $model = new EmployeeModel();
+
+        $employees = $model->findAll();
+
+        return $this->response->setJSON([
+            'status' => true,
+            'data'   => $employees
+        ]);
+    }
+}
+
+-----------------------------------------------------
+
+2. Add the API route
+
+app/Config/Routes.php
+
+$routes->get('/api/employees', 'Api\EmployeeApiController::index');
+
+http://localhost:8080/api/employees
+
+
+output : 
+{
+    "status": true,
+    "data": [
+        {
+            "id": "1",
+            "name": "John Doe",
+            "email": "john@example.com",
+            "phone": "9876543210",
+            "department": "IT",
+            "profile_image": "abc123.jpg",
+            "status": "active"
+        }
+    ]
+}

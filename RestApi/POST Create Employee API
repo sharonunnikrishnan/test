@@ -1,0 +1,83 @@
+POST /api/employees
+
+
+app/Controllers/Api/EmployeeApiController.php
+
+----------------------------------------------------- 
+
+1. Add create() to the API controller
+
+public function create()
+{
+    $rules = [
+        'name'       => 'required|min_length[3]|max_length[100]',
+        'email'      => 'required|valid_email',
+        'phone'      => 'required|min_length[10]|max_length[15]',
+        'department' => 'required',
+        'status'     => 'required|in_list[active,inactive]',
+    ];
+
+    if (!$this->validate($rules)) {
+        return $this->response
+            ->setStatusCode(422)
+            ->setJSON([
+                'status' => false,
+                'errors' => $this->validator->getErrors()
+            ]);
+    }
+
+    $model = new EmployeeModel();
+
+    $data = [
+        'name'       => $this->request->getPost('name'),
+        'email'      => $this->request->getPost('email'),
+        'phone'      => $this->request->getPost('phone'),
+        'department' => $this->request->getPost('department'),
+        'status'     => $this->request->getPost('status'),
+    ];
+
+    $model->insert($data);
+
+    return $this->response
+        ->setStatusCode(201)
+        ->setJSON([
+            'status'  => true,
+            'message' => 'Employee created successfully',
+            'id'      => $model->getInsertID()
+        ]);
+}
+
+----------------------------------------------------------------------
+2. Add the POST route
+
+$routes->post('/api/employees', 'Api\EmployeeApiController::create');
+
+---------------------------------------------------------------------- 
+
+201 Created
+422 Unprocessable Content
+
+---------------------------------------------------------------------- 
+
+3. Test with Postman
+
+POST
+http://localhost:8080/api/employees
+
+Body → x-www-form-urlencoded
+
+| Key | Value |
+|---|---|
+| name | Test Employee |
+| email | test@example.com |
+| phone | 9876543210 |
+| department | IT |
+| status | active |
+
+Expected response:
+
+{
+    "status": true,
+    "message": "Employee created successfully",
+    "id": 5
+}

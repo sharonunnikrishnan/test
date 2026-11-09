@@ -1,0 +1,88 @@
+PUT/PATCH Update Employee API
+
+PUT /api/employees/5
+
+-------------------------------------------------
+
+1. Add update() to the API controller
+
+app/Controllers/Api/EmployeeApiController.php
+
+
+public function update($id)
+{
+    $model = new EmployeeModel();
+
+    $employee = $model->find($id);
+
+    if (!$employee) {
+        return $this->response
+            ->setStatusCode(404)
+            ->setJSON([
+                'status'  => false,
+                'message' => 'Employee not found'
+            ]);
+    }
+
+    $rules = [
+        'name'       => 'required|min_length[3]|max_length[100]',
+        'email'      => 'required|valid_email',
+        'phone'      => 'required|min_length[10]|max_length[15]',
+        'department' => 'required',
+        'status'     => 'required|in_list[active,inactive]',
+    ];
+
+    if (!$this->validate($rules)) {
+        return $this->response
+            ->setStatusCode(422)
+            ->setJSON([
+                'status' => false,
+                'errors' => $this->validator->getErrors()
+            ]);
+    }
+
+    $data = [
+        'name'       => $this->request->getPost('name'),
+        'email'      => $this->request->getPost('email'),
+        'phone'      => $this->request->getPost('phone'),
+        'department' => $this->request->getPost('department'),
+        'status'     => $this->request->getPost('status'),
+    ];
+
+    $model->update($id, $data);
+
+    return $this->response->setJSON([
+        'status'  => true,
+        'message' => 'Employee updated successfully'
+    ]);
+}
+
+---------------------------------------------------
+
+2. Add the route
+
+$routes->put('/api/employees/(:num)', 'Api\EmployeeApiController::update/$1');
+
+----------------------------------------------------- 
+
+3. Test with Postman
+
+PUT
+
+http://localhost:8080/api/employees/1
+
+Body → x-www-form-urlencoded
+
+Key	Value
+name	Updated Employee
+email	updated@example.com
+phone	9876543211
+department	HR
+status	active
+
+Expected response:
+{
+    "status": true,
+    "message": "Employee updated successfully"
+}
+

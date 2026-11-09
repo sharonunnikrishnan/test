@@ -1,0 +1,32 @@
+GET /api/employees/{id}
+
+GET /api/employees/5
+
+---------------------------------
+
+app/Controllers/Api/EmployeeApiController.php
+
+public function show($id)
+{
+    $model = new EmployeeModel();
+
+    $employee = $model->find($id);
+
+    if (!$employee) {
+        return $this->response
+            ->setStatusCode(404)
+            ->setJSON([
+                'status'  => false,
+                'message' => 'Employee not found'
+            ]);
+    }
+
+    return $this->response->setJSON([
+        'status' => true,
+        'data'   => $employee
+    ]);
+}
+
+-------------------------------------------------
+
+$routes->get('/api/employees/(:num)', 'Api\EmployeeApiController::show/$1');
