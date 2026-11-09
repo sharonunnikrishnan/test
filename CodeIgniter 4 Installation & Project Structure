@@ -1,0 +1,16 @@
+Create Project
+---------------
+composer create-project codeigniter4/appstarter employee-management
+
+
+cd employee-management
+php spark serve
+
+
+Create Migration
+----------------
+php spark make:migration create_employees_table
+
+Run the migration
+-----------------
+php spark migrate

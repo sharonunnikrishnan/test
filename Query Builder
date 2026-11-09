@@ -1,0 +1,141 @@
+$db = \Config\Database::connect();
+
+$builder = $db->table('employees');
+
+$query = $builder->get();
+
+$employees = $query->getResultArray();
+
+
+--------------------------------------------
+$db = \Config\Database::connect();
+
+$employees = $db
+    ->table('employees')
+    ->get()
+    ->getResultArray();
+
+----------------------------------------------
+
+$employees = $db
+    ->table('employees')
+    ->where('department', 'IT')
+    ->get()
+    ->getResultArray();
+    
+----------------------------------------------
+
+$employees = $db
+    ->table('employees')
+    ->whereIn('department', ['IT', 'HR', 'Finance'])
+    ->get()
+    ->getResultArray();
+
+    ----------------------------------------------
+    $employees = $db
+    ->table('employees')
+    ->like('name', 'sha')
+    ->get()
+    ->getResultArray();
+    -----------------------------------------------
+    
+    
+    $builder = $db->table('employees');
+
+$builder->groupStart()
+    ->like('name', $search)
+    ->orLike('email', $search)
+    ->orLike('phone', $search)
+    ->groupEnd();
+
+$employees = $builder
+    ->get()
+    ->getResultArray();
+    -------------------------------------------
+
+    $employees = $db
+    ->table('employees')
+    ->orderBy('id', 'DESC')
+    ->get()
+    ->getResultArray();
+
+    --------------------------------------
+
+    $employees = $db
+    ->table('employees')
+    ->limit(5)
+    ->get()
+    ->getResultArray();
+
+    ---------------------------------
+    $data = [
+    'name'       => 'Anjali',
+    'email'      => 'anjali@example.com',
+    'phone'      => '9876543210',
+    'department' => 'HR',
+    'status'     => 1,
+];
+
+$db->table('employees')->insert($data);
+
+---------------------------------------------
+
+$count = $db
+    ->table('employees')
+    ->where('status', 1)
+    ->countAllResults();
+
+    --------------------------
+
+    $model = new EmployeeModel();
+
+$employees = $model
+    ->where('status', 1)
+    ->findAll();
+
+    -------------------------------
+
+    public function search()
+{
+    $search = $this->request->getGet('search');
+
+    $db = \Config\Database::connect();
+
+    $builder = $db->table('employees');
+
+    if ($search) {
+        $builder->groupStart()
+            ->like('name', $search)
+            ->orLike('email', $search)
+            ->orLike('phone', $search)
+            ->orLike('department', $search)
+            ->groupEnd();
+    }
+
+    $employees = $builder
+        ->orderBy('id', 'DESC')
+        ->get()
+        ->getResultArray();
+
+    return view('employees/index', [
+        'employees' => $employees
+    ]);
+}
+
+
+<form method="get" action="/employees/search">
+
+    <input
+        type="text"
+        name="search"
+        placeholder="Search employees"
+    >
+
+    <button type="submit">
+        Search
+    </button>
+
+</form>
+
+
+$routes->get('/employees/search', 'Employee::search');
