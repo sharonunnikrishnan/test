@@ -1,0 +1,41 @@
+I am continuing my **CodeIgniter 4 interview preparation** from another chat in the same project.
+
+I have completed:
+
+- Step 1 — CodeIgniter 4 installation and project structure
+- Step 2 — Routing
+- Step 3 — Controllers and Views
+- Step 4 — Models + MySQL
+- Step 5 — Query Builder
+
+I am building a practical **Employee Management System** with:
+
+- id
+- name
+- email
+- phone
+- department
+- profile_image
+- status
+
+We have already created the `employee_management` MySQL database, `employees` table through a migration, and `EmployeeModel`.
+
+The next step is **Step 6 — CRUD Operations**.
+
+Please continue from Step 6 and teach me **hands-on, one step at a time**. I want to implement:
+
+1. Employee listing
+2. Add employee
+3. Edit employee
+4. Delete employee
+5. Form handling
+6. Validation
+7. Later image upload
+8. Later jQuery/AJAX
+9. Later REST API
+10. Later external API consumption
+11. Interview questions throughout
+
+I am a Laravel developer, so explain the CodeIgniter 4 approach alongside Laravel equivalents where useful.
+
+**Do not give me all the remaining material at once. Start with Step 6 — CRUD and give me the first implementation task. Wait for me to confirm completion before moving to the next part.**
